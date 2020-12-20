@@ -15,7 +15,7 @@ class Word:
             lda_form=token.text.lower(),
             include=(
                 (not token.is_stop)
-                and (token.pos_ not in ['PUNCT'])
+                and (token.pos_ not in ['PUNCT', 'SPACE'])
             )
         )
     
@@ -23,8 +23,8 @@ class Word:
     def __repr__(self):
         return (
             f'{type(self).__name__}('
-                f'original_form={self.original_form}, '
-                f'lda_form={self.lda_form}, '
+                f'original_form={repr(self.original_form)}, '
+                f'lda_form={repr(self.lda_form)}, '
                 f'include={self.include}'
             f')'
         )
