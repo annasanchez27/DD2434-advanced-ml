@@ -1,4 +1,5 @@
 from functools import reduce
+from collections import Counter
 
 
 class Corpus:
@@ -19,8 +20,25 @@ class Corpus:
         )
     
 
+    @property
+    def word_count(self):
+        return Counter(
+            word
+            for document in self.documents
+            for word in document.included_words
+        )
+
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+    
+
     def __len__(self):
         return len(self.documents)
+    
+
+    def __hash__(self):
+        return hash(self.documents)
 
     
     def __repr__(self):

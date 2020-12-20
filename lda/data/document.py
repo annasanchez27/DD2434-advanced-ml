@@ -1,3 +1,4 @@
+from collections import Counter
 import spacy
 nlp = spacy.load('en_core_web_md')
 from .word import Word
@@ -23,8 +24,30 @@ class Document:
         )
     
 
+    @property
+    def included_words(self):
+        return [
+            word
+            for word in self.words
+            if word.include
+        ]
+    
+
+    @property
+    def word_count(self):
+        return Counter(self.included_words)
+
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+    
+
     def __len__(self):
         return len(self.words)
+    
+
+    def __hash__(self):
+        return hash((self.words, self.title, self.topics))
     
 
     def __repr__(self):

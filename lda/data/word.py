@@ -17,9 +17,17 @@ class Word:
             include=(
                 (not token.is_stop)
                 and (token.pos_ not in ['PUNCT', 'SPACE', 'SYM', 'NUM', 'X'])
-                and (set(token.text) & set(string.ascii_letters))
+                and len(set(token.text) & set(string.ascii_letters)) > 0
             )
         )
+
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+    
+
+    def __hash__(self):
+        return hash((self.lda_form, self.include))
     
 
     def __repr__(self):
