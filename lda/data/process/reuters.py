@@ -25,6 +25,7 @@ def read_file(path: Path):
             document
             for article in soup.find_all('reuters')
             if (document := read_article(article)) is not None
+            if len(document) > 0
         ]
     )
 

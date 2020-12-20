@@ -42,7 +42,7 @@ class Document:
     
 
     def __len__(self):
-        return len(self.words)
+        return len(self.included_words)
     
 
     def __hash__(self):
@@ -50,4 +50,4 @@ class Document:
     
 
     def __repr__(self):
-        return f'{type(self).__name__} with {len(self)} words'
+        return f'{type(self).__name__} including {len(self)} words'
