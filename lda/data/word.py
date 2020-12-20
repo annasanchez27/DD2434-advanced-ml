@@ -1,3 +1,4 @@
+import string
 from spacy.tokens import Token
 
 
@@ -15,7 +16,8 @@ class Word:
             lda_form=token.text.lower(),
             include=(
                 (not token.is_stop)
-                and (token.pos_ not in ['PUNCT', 'SPACE'])
+                and (token.pos_ not in ['PUNCT', 'SPACE', 'SYM', 'NUM', 'X'])
+                and (set(token.text) & set(string.ascii_letters))
             )
         )
     
