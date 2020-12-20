@@ -1,7 +1,6 @@
 from collections import Counter
-import spacy
-nlp = spacy.load('en_core_web_md')
 from .word import Word
+from .nlp import nlp
 
 
 class Document:
