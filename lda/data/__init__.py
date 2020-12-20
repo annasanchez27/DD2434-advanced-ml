@@ -1,1 +1,1 @@
-from .reuters import reuters
+from .data import reuters
