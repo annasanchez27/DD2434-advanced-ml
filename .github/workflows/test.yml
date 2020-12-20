@@ -21,19 +21,25 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('poetry.lock') }}-${{ github.ref }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-          ${{ runner.os }}-
+        key: ${{ runner.os }}-pip-${{ github.ref }}
+
+    - name: Cache poetry environment
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pypoetry
+        key: ${{ runner.os }}-poetry-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('poetry.lock') }}-${{ github.ref }}
+
     - name: Install dependencies
       run: |
         curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
         source $HOME/.poetry/env
         poetry install
+
     - name: Test with pytest
       run: |
         source $HOME/.poetry/env
         poetry run python -m pytest
+
     - name: Build wheels
       run: |
         source $HOME/.poetry/env
