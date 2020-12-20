@@ -21,3 +21,11 @@ class Document:
             title=title,
             topics=topics,
         )
+    
+
+    def __len__(self):
+        return len(self.words)
+    
+
+    def __repr__(self):
+        return f'{type(self).__name__} with {len(self)} words'

@@ -18,3 +18,13 @@ class Word:
                 and (token.pos_ not in ['PUNCT'])
             )
         )
+    
+
+    def __repr__(self):
+        return (
+            f'{type(self).__name__}('
+                f'original_form={self.original_form}, '
+                f'lda_form={self.lda_form}, '
+                f'include={self.include}'
+            f')'
+        )

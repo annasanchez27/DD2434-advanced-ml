@@ -17,3 +17,11 @@ class Corpus:
                 ]
             )
         )
+    
+
+    def __len__(self):
+        return len(self.documents)
+
+    
+    def __repr__(self):
+        return f'{type(self).__name__} with {len(self)} documents'
