@@ -1,6 +1,8 @@
 from lda import data
 from sklearn.model_selection import train_test_split
 import numpy as np
+from sklearn.feature_extraction import DictVectorizer
+
 
 def main():
   reuters = data.reuters
@@ -12,12 +14,20 @@ def main():
       X.append(doc)
       if "grain" in doc.topics:
         y.append(1)
-        print(doc.topics)
       else:
         y.append(0)
         
   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
-  print(X_test[0].word_count)
+  doc = X_test[1]
+  dd = {}
+  count = doc.word_count
+  for d in doc.included_words:
+    print(d)
+    dd[d.lda_form] = count[d]
+  print(dd)
+
+  # vec = DictVectorizer()
+  # print(vec.fit_transform(doc).toarray())
 
 if __name__ == "__main__":
   main()    
