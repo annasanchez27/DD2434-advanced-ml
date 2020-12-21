@@ -13,7 +13,7 @@ class Word:
     def from_token(cls, token: Token):
         return cls(
             original_form=token.text,
-            lda_form=token.lemma_,
+            lda_form=token.lemma_.lower(),
             include=(
                 (not token.is_stop)
                 and (token.pos_ not in ['PUNCT', 'SPACE', 'SYM', 'NUM', 'X'])
