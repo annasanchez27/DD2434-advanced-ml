@@ -21,6 +21,11 @@ class Corpus:
     
 
     @property
+    def vocabulary(self):
+        return set(self.word_count)
+    
+
+    @property
     def word_count(self):
         return Counter(
             word
