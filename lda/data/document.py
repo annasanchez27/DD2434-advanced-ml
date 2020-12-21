@@ -46,7 +46,11 @@ class Document:
     
 
     def __hash__(self):
-        return hash((self.words, self.title, self.topics))
+        return hash((
+            tuple(self.words),
+            self.title,
+            None if self.topics is None else tuple(self.topics)
+        ))
     
 
     def __repr__(self):
