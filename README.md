@@ -10,6 +10,6 @@ Final project for Advanced Machine Learning @ KTH.
 ### Adding dependencies
 **Don't** `pip install` anything. Instead:
 * If the dependency is needed for running our code, run `poetry add <dependency_name>`
-* If the dependency is for something related to our development process (eg. testing), run `poetry add --dev <dependency_name>`
+* Otherwise, if the dependency is only for something related to our development process (eg. testing), run `poetry add --dev <dependency_name>`
 
 After adding dependencies, make sure to commit the changes that `poetry` automatically made to `pyproject.toml` and `poetry.lock`. After the others pull your changes, they'll need to run `poetry update` to make sure they're in sync - but `poetry` will tell them automatically when they need to do it.
