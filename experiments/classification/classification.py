@@ -107,7 +107,7 @@ def main():
   parser = argparse.ArgumentParser(description='Parse arguments for classification.')
   parser.add_argument('--label', default='grain', help='Classification label', type=str)
   parser.add_argument('--show_fig', action='store_true', default=False, help='Show accuracy plot.')
-  parser.add_argument('--dest', default='../data/classification', help='Path to directory to save plot and labels.')
+  parser.add_argument('--dest', default='experiments/data/classification', help='Path to directory to save plot and labels.')
   parser.add_argument('--seeds', default=5, help='Number of different random seeds for train_test_split.')
   args = parser.parse_args()
 
