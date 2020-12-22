@@ -1,18 +1,56 @@
 from lda.data.document import Document
 from lda.data.corpus import Corpus
+from lda.data.word import Word
 from experiments.classification import classification
 import numpy as np
 
-doc1 = Document.from_text('Mary had a little lamb. Little lamb, little lamb.', topics=['nursery_rhyme', 'lamb'])
-doc2 = Document.from_text('Itsy bitsy spider.', topics=['nursery_rhyme'])
-doc3 = Document.from_text('Lorem ipsum', topics=['placeholder'])
-doc_without_topic = Document.from_text('Doc without topic')
-doc_without_topic2 = Document.from_text('Doc with empty topic arr', topics=[])
+def create_word(original, include=True):
+  return Word(original, original.lower(), include=include)
+
+
+def create_mary_corpus():
+  mary = create_word("Mary") 
+  had = create_word("had", include=False)
+  a = create_word("a", include=False)
+  little = create_word("little")
+  Little = create_word("Little")
+  lamb = create_word("lamb")
+  return Document([mary, had, a, little, lamb, Little, lamb, little, lamb], topics=['nursery_rhyme', 'lamb'])
+
+def create_itsy_corpus():
+  Itsy = create_word("Itsy")
+  bitsy = create_word("bitsy")
+  spider = create_word("spider")
+  return Document([Itsy, bitsy, spider], topics=['nursery_rhyme'])
+
+def create_lorem_corpus():
+  Lorem = create_word("Lorem")
+  ipsum = create_word("ipsum")
+  dot = create_word(".", include=False)
+  return Document([Lorem, ipsum, dot], topics=['placeholder'])
+
+def create_corpus_without_topics():
+  word1 = create_word("word1")
+  word2 = create_word("word2")
+  return Document([word1, word1, word2])
+
+def create_corpus_with_empty_topics():
+  word1 = create_word("word1")
+  word2 = create_word("word2")
+  return Document([word1, word1, word2], topics=[])
 
 def create_corpus():
-  return Corpus([doc1, doc2, doc3, doc_without_topic, doc_without_topic2])
+  doc1 = create_mary_corpus()
+  doc2 = create_itsy_corpus()
+  doc3 = create_lorem_corpus()
+  doc_without_topic = create_corpus_without_topics()
+  doc_with_empty_topic = create_corpus_with_empty_topics()
+  return Corpus([doc1, doc2, doc3, doc_without_topic, doc_with_empty_topic])
 
 def create_corpus_with_topics():
+  doc1 = create_mary_corpus()
+  doc2 = create_itsy_corpus()
+  doc3 = create_lorem_corpus()
   return Corpus([doc1, doc2, doc3])
 
 def test_corpus_with_topics():
@@ -22,7 +60,8 @@ def test_corpus_with_topics():
   docs_with_topics = classification.corpus_to_documents_with_topics(corpus)
   
   assert len(docs_with_topics) == len(expected_docs_with_topics)
-  assert docs_with_topics == expected_docs_with_topics
+  for i, doc in enumerate(docs_with_topics):
+    assert doc == expected_docs_with_topics[i]
 
 def test_topic_to_labels():
   docs_with_topics = create_corpus_with_topics().documents
