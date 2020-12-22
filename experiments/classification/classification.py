@@ -12,18 +12,19 @@ from sklearn.metrics import accuracy_score
 from scipy import sparse
 
 
-def to_corpus_with_topics(corpus):
+def corpus_to_documents_with_topics(corpus):
   """ Returns list of documents which contain at least one topic. """
+  all_documents = corpus.documents
   documents_with_topics = []
-  for doc in corpus:
-    if doc.topics != []:
+  for doc in all_documents:
+    if doc.topics != [] and doc.topics is not None:
       documents_with_topics.append(doc)
   return documents_with_topics
 
 
-def topic_to_labels(label_name, corpus):
+def topic_to_labels(label_name, documents):
   labels = []
-  for doc in corpus:
+  for doc in documents:
     if label_name in doc.topics:
       labels.append(1)
     else:
@@ -32,9 +33,9 @@ def topic_to_labels(label_name, corpus):
   return np.array(labels)
 
 
-def corpus_to_wordcount_dicts(corpus):
+def docs_to_wordcount_dicts(documents):
   all_wordcounts = []
-  for doc in corpus:
+  for doc in documents:
     doc_wordcount = {}
     wordcount = doc.word_count
     for word in doc.included_words:
@@ -44,14 +45,14 @@ def corpus_to_wordcount_dicts(corpus):
   return all_wordcounts
 
 
-def corpuses_to_features(X_train_corpus, X_test_corpus, test_size):
+def docs_to_features(X_train_docs, X_test_docs, test_size):
   vec = DictVectorizer()
   tt = TfidfTransformer(use_idf=False)
 
-  wordcount_dicts = corpus_to_wordcount_dicts(X_train_corpus)
+  wordcount_dicts = docs_to_wordcount_dicts(X_train_docs)
   wordcounts_matrix = vec.fit_transform(wordcount_dicts).toarray()
   X_train = tt.fit_transform(wordcounts_matrix)
-  wordcount_dicts = corpus_to_wordcount_dicts(X_test_corpus)
+  wordcount_dicts = docs_to_wordcount_dicts(X_test_docs)
   wordcounts_matrix = vec.transform(wordcount_dicts).toarray()
   X_test = tt.transform(wordcounts_matrix)
 
@@ -67,8 +68,8 @@ def classification(label_name, corpus, dest_dir, test_size=0.8, random_state=42)
   else:
     y = np.load(label_file)
 
-  X_train_corpus, X_test_corpus, y_train, y_test = train_test_split(corpus, y, test_size=test_size, random_state=random_state)
-  X_train, X_test = corpuses_to_features(X_train_corpus, X_test_corpus, test_size)
+  X_train_docs, X_test_docs, y_train, y_test = train_test_split(corpus, y, test_size=test_size, random_state=random_state)
+  X_train, X_test = docs_to_features(X_train_docs, X_test_docs, test_size)
   
   SVM = SVC()
   SVM.fit(X_train, y_train)
@@ -88,6 +89,7 @@ def classification_for_label(corpus, label_name, show_fig, dest_dir, seed_num):
 
     y.append(np.mean(accuracies))
     yerr.append(np.var(accuracies))
+    print("Accuracy for training fraction ", train_frac, ":", np.mean(accuracies))
   
   plt.figure()
   plt.errorbar(train_data_fractions, y, yerr=yerr, label='Word features')
@@ -109,9 +111,8 @@ def main():
   parser.add_argument('--seeds', default=5, help='Number of different random seeds for train_test_split.')
   args = parser.parse_args()
 
-  reuters = data.reuters
-  documents = reuters.documents
-  corpus = to_corpus_with_topics(documents)
+  reuters_corpus = data.reuters
+  corpus = corpus_to_documents_with_topics(reuters_corpus)
 
   print(args)
   classification_for_label(corpus, args.label, args.show_fig, args.dest, args.seeds)
