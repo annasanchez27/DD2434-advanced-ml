@@ -2,14 +2,14 @@ import numpy as np
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 
+
 def corpus_to_documents_with_topics(corpus):
     """ Returns list of documents which contain at least one topic. """
-    all_documents = corpus.documents
-    documents_with_topics = []
-    for doc in all_documents:
-        if doc.topics:
-            documents_with_topics.append(doc)
-    return documents_with_topics
+    return [
+        document
+        for document in corpus.documents
+        if document.topics
+    ]
 
 
 def topic_to_labels(label_name, documents):
