@@ -1,16 +1,15 @@
-from lda import data
-from pathlib import Path
+import argparse
 import numpy as np
 import os
+import matplotlib.pyplot as plt
+from lda import data
+from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from scipy import sparse
-import matplotlib.pyplot as plt
-
-DATA_DIR = os.path.join(os.path.dirname( __file__ ), '..', 'data', 'classification')
 
 
 def to_corpus_with_topics(corpus):
@@ -59,12 +58,12 @@ def corpuses_to_features(X_train_corpus, X_test_corpus, test_size):
   return X_train, X_test
 
 
-def classification(label_name, corpus, test_size, random_state=42): 
+def classification(label_name, corpus, dest_dir, test_size=0.8, random_state=42): 
   label_filename = label_name + '_labels.npy'
-  label_file = Path(os.path.join(DATA_DIR, label_filename))
+  label_file = Path(os.path.join(dest_dir, label_filename))
   if not label_file.is_file():
     y = topic_to_labels(label_name, corpus)
-    np.save(os.path.join(DATA_DIR, label_filename), y)
+    np.save(os.path.join(dest_dir, label_filename), y)
   else:
     y = np.load(label_file)
 
@@ -77,20 +76,18 @@ def classification(label_name, corpus, test_size, random_state=42):
   return accuracy_score(y_pred, y_test)*100 
 
 
-def classification_for_label(corpus, label_name):
+def classification_for_label(corpus, label_name, show_fig, dest_dir, seed_num):
   train_data_fractions = [0.01, 0.05, 0.1, 0.2]
   y = []
   yerr = []
   for train_frac in train_data_fractions:
     accuracies = []
-    for random_state in range(10):
-      acc = classification(label_name, corpus, test_size=1-train_frac, random_state=random_state)
+    for random_state in range(seed_num):
+      acc = classification(label_name, corpus, dest_dir, test_size=1-train_frac, random_state=random_state)
       accuracies.append(acc)
 
     y.append(np.mean(accuracies))
     yerr.append(np.var(accuracies))
-    print(np.mean(accuracies))
-    print(np.var(accuracies))
   
   plt.figure()
   plt.errorbar(train_data_fractions, y, yerr=yerr, label='Word features')
@@ -98,17 +95,26 @@ def classification_for_label(corpus, label_name):
   plt.xlabel('Proportion of data used for training')
   plt.ylabel('Accuracy')
   plt.legend()
-  plt.savefig(os.path.join(DATA_DIR, label_name))
+  fig = plt.gcf()
+  fig.savefig(os.path.join(dest_dir, label_name))
+  if show_fig:
+    plt.show()
 
 
 def main():
+  parser = argparse.ArgumentParser(description='Parse arguments for classification.')
+  parser.add_argument('--label', default='grain', help='Classification label', type=str)
+  parser.add_argument('--show_fig', action='store_true', default=False, help='Show accuracy plot.')
+  parser.add_argument('--dest', default='.', help='Path to directory to save plot and labels.')
+  parser.add_argument('--seeds', default=5, help='Number of different random seeds for train_test_split.')
+  args = parser.parse_args()
+
   reuters = data.reuters
   documents = reuters.documents
   corpus = to_corpus_with_topics(documents)
 
-  classification_for_label(corpus, 'grain')
-  classification_for_label(corpus, 'earn')
-
+  print(args)
+  classification_for_label(corpus, args.label, args.show_fig, args.dest, args.seeds)
 
 if __name__ == "__main__":
   main()    
