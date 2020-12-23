@@ -4,8 +4,8 @@ from scipy.special import loggamma, digamma, polygamma
 from lda.data.document import Document
 
 
-def alpha_update(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], max_iterations=1024):
-    for iteration in range(max_iterations):
+def alpha_update(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], num_iterations=1024):
+    for iteration in range(num_iterations):
         alpha = step(alpha=alpha, gammas=gammas)
     return alpha
 
