@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm.auto import trange
 from lda.data.corpus import Corpus
 from .e_step import e_step
 from .m_step import m_step
@@ -31,7 +32,7 @@ def lda(corpus: Corpus, num_topics=64, num_iterations=1024):
             for topic in range(num_topics)
         ]
     }
-    for iteration in range(num_iterations):
+    for iteration in trange(num_iterations):
         variational_parameters = {
             document: e_step(
                 document=document,
