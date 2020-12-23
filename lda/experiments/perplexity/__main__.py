@@ -21,7 +21,6 @@ def unigram(documents):
 
 def unigram_perplexity(model, documents):
     perpl_sum = 0
-    perplexity = 1
     n = 0
     for doc in documents:
         p_wd = 1
