@@ -5,30 +5,6 @@ from lda.data.document import Document
 from lda.data.word import Word
 
 
-def m_step(corpus: Corpus, phis: Dict[Document, np.ndarray], gammas: Dict[Document, np.ndarray]):
-    '''
-    Parameters:
-    * corpus: a Corpus object
-    * phis: {document: array of size (document_length, num_topics)}
-        (document is a Document object, so phis is a dictionary)
-    * gammas: {document: array of size (num_topics,)}
-        (document is a Document object, so gammas is a dictionary)
-    Returns: {
-        'alpha': array of size (num_topics,)
-        'beta': beta[topic_id][word] = probability of word in topic
-            (word is a Word object, so beta[topic_id] is a dictionary)
-    }
-    '''
-    return {
-        'alpha': alpha_update(),
-        'beta': beta_update(corpus=corpus, phis=phis),
-    }
-
-
-def alpha_update():
-    pass # TODO
-
-
 def beta_update(corpus: Corpus, phis: Dict[Document, np.ndarray]):
     num_topics = next(iter(phis.values())).shape[1]
     return [
