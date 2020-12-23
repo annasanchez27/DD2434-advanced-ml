@@ -5,6 +5,7 @@ from lda.data.word import Word
 from lda.variational import m_step
 from lda.variational.m_step.alpha_update import alpha_update
 from lda.variational.m_step.beta_update import beta_update
+from utils import assert_numerically_ok
 
 
 def test_m_step():
@@ -18,7 +19,7 @@ def test_alpha():
         gammas=gammas
     )
     assert alpha.shape == alpha_initial.shape
-    assert np.all(~np.isnan(alpha))
+    assert_numerically_ok(alpha)
     assert np.all(alpha > 0)
 
 
