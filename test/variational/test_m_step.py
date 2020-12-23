@@ -3,18 +3,23 @@ from lda.data.corpus import Corpus
 from lda.data.document import Document
 from lda.data.word import Word
 from lda.variational import m_step
-from lda.variational.m_step import alpha_update, beta_update
+from lda.variational.m_step.alpha_update import alpha_update
+from lda.variational.m_step.beta_update import beta_update
 
 
 def test_m_step():
-    parameters = m_step(corpus=corpus, phis=phis, gammas=gammas)
-    # TODO: this test will fail until someone implements alpha_update
-    assert parameters['alpha'] is not None
+    parameters = m_step(corpus=corpus, alpha=alpha_initial, phis=phis, gammas=gammas)
+    assert set(parameters.keys()) == {'alpha', 'beta'}
 
 
 def test_alpha():
-    # TODO: this test will fail until someone implements alpha_update
-    alpha = alpha_update(corpus=corpus, phis=phis, gammas=gammas)
+    alpha = alpha_update(
+        alpha=alpha_initial,
+        gammas=gammas
+    )
+    assert alpha.shape == alpha_initial.shape
+    assert np.all(~np.isnan(alpha))
+    assert np.all(alpha > 0)
 
 
 def test_beta():
@@ -48,8 +53,12 @@ doc2 = Document(
     ]
 )
 corpus = Corpus(documents=[doc1, doc2])
+alpha_initial = np.array([0.7, 1.2])
 phis = {
     doc1: np.array([[1, 0], [0, 1]]),
     doc2: np.array([[1, 0], [0, 1]]),
 }
-gammas = None # TODO: whoever implements alpha_update will know what to put here
+gammas = {
+    doc1: np.array([0.9, 1.8]),
+    doc2: np.array([1.5, 1.3]),
+}
