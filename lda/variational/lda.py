@@ -5,8 +5,22 @@ from .m_step import m_step
 
 
 def lda(corpus: Corpus, num_topics=64, num_iterations=1024):
+    '''
+    Parameters:
+    * corpus: a Corpus object
+    * num_topics: number of topics :)
+    * num_iterations: go see a doctor
+    Returns: {
+        'alpha': array of size (num_topics,)
+        'beta': beta[topic_id][word] = probability of word in topic
+            (word is a Word object, so beta[topic_id] is a dictionary)
+        'phis': {document: array of size (document_length, num_topics)}
+            (document is a Document object, so phis is a dictionary)
+        'gammas': {document: array of size (num_topics,)}
+            (document is a Document object, so gammas is a dictionary)
+    }
+    '''
     vocab = corpus.vocabulary
-    print(vocab)
     params = {
         'alpha': np.random.uniform(size=num_topics),
         'beta': [
@@ -17,7 +31,6 @@ def lda(corpus: Corpus, num_topics=64, num_iterations=1024):
             for topic in range(num_topics)
         ]
     }
-    print(params['beta'])
     for iteration in range(num_iterations):
         variational_parameters = {
             document: e_step(
