@@ -21,6 +21,7 @@ def lda(corpus: Corpus, num_topics=64, num_iterations=1024):
             (document is a Document object, so gammas is a dictionary)
     }
     '''
+    lower_bound_evol = []
     vocab = corpus.vocabulary
     params = {
         'alpha': np.random.uniform(size=num_topics),
@@ -57,7 +58,10 @@ def lda(corpus: Corpus, num_topics=64, num_iterations=1024):
             phis=params['phis'],
             gammas=params['gammas']
         ))
-    return params
+        lower_bound_evol.append(corpus_lower_bound(corpus=corpus, 
+        alpha=params["alpha"], beta=params["beta"], phis=params['phis'], 
+                                                      gammas=params["gammas"]))
+    return params, lower_bound_evol
 
 
 def corpus_lower_bound(corpus, alpha, beta, phis, gammas):
@@ -67,7 +71,7 @@ def corpus_lower_bound(corpus, alpha, beta, phis, gammas):
             document=document,
             alpha=alpha,
             beta=beta,
-            phis=phis[document],
+            phi=phis[document],
             gamma=gammas[document]
         )
         for document in corpus.documents
