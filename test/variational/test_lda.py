@@ -7,7 +7,7 @@ from utils import assert_numerically_ok
 
 
 def test_lda():
-    params = lda(corpus, num_topics=2, num_iterations=32)
+    params, lower_bound_evol = lda(corpus, num_topics=2, num_iterations=32)
     assert set(params.keys()) == {'alpha', 'beta', 'phis', 'gammas'}
     
     assert params['alpha'].shape == (2,)
