@@ -59,18 +59,42 @@ def lda(corpus: Corpus, num_topics=64, num_iterations=1024):
         ))
     return params
 
-"Eq. 15 on the paper. Lower bound to maximize for a document"
-def document_lower_bound(alpha, phi, gamma):
-    lower_bound = loggamma(np.sum(alpha)) - np.sum(loggamma(alpha))
-    lower_bound += np.sum((alpha-1)*(digamma(gamma)-digamma(np.sum(gamma))))
-    for n in range(phi.shape[0]):
-        lower_bound += np.sum(phi[n, :] * (digamma(gamma)-digamma(np.sum(gamma))))
-    # term with three sums to calculate
-    
-    lower_bound += -loggamma(np.sum(gamma)) + np.sum(loggamma(gamma))
-    lower_bound -= np.sum((gamma-1)*(digamma(gamma)-digamma(np.sum(gamma))))
-    lower_bound -= np.sum(phi * np.log(phi))
-    return lower_bound
+
+def corpus_lower_bound(corpus, alpha, beta, phis, gammas):
+    return sum(
+        document_lower_bound(
+            corpus=corpus,
+            document=document,
+            alpha=alpha,
+            beta=beta,
+            phis=phis[document],
+            gamma=gammas[document]
+        )
+        for document in corpus.documents
+    )
+
+
+def document_lower_bound(corpus, document, alpha, beta, phi, gamma):
+    '''Eq. 15 on the paper. Lower bound to maximize for a document'''
+    return (
+        loggamma(np.sum(alpha)) - np.sum(loggamma(alpha))
+        + np.sum((alpha-1)*(digamma(gamma)-digamma(np.sum(gamma))))
+        + sum(
+            np.sum(phi[n, :] * (digamma(gamma)-digamma(np.sum(gamma))))
+            for n in range(phi.shape[0])
+        )
+        + sum(
+            phi[word_idx, topic] * np.log(beta[topic][vocab_word])
+            for word_idx, document_word in enumerate(document.included_words)
+            for topic in range(alpha.shape[0])
+            for vocab_word in corpus.vocabulary
+            if document_word == vocab_word
+        )
+        - loggamma(np.sum(gamma)) + np.sum(loggamma(gamma))
+        - np.sum((gamma-1)*(digamma(gamma)-digamma(np.sum(gamma))))
+        - np.sum(phi * np.log(phi))
+    )
+
 
 def random_categorical_distribution(num_choices):
     unnormalized = np.random.uniform(size=num_choices)
