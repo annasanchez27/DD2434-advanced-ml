@@ -39,7 +39,7 @@ class Document:
         return Counter(self.included_words)
     
 
-    def text(self, colors: List=None):
+    def to_text(self, colors: List=None):
         '''The reconstructed text of the document, with optional coloring'''
         if colors is None:
             colors = [None for word in self.words]

@@ -29,7 +29,7 @@ def color_by_phis(corpus, phis):
         for topic, color in zip(sorted_topics, available_colors)
     }
     return {
-        document: document.text(colors=[
+        document: document.to_text(colors=[
             (
                 topic_color_mapping[topic]
                 if (
