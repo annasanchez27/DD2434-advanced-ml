@@ -34,7 +34,7 @@ def test_lda():
         assert gamma_row.shape == (2,)
         assert_numerically_ok(gamma_row)
         assert np.all(gamma_row > 0)
-        assert np.all(gamma_row > params['alpha'])
+        assert np.all(gamma_row >= params['alpha'])
     
     assert np.all(lower_bound_evol[1:] - lower_bound_evol[:-1] >= 0)
 
