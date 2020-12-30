@@ -95,8 +95,14 @@ def document_lower_bound(corpus, document, alpha, beta, phi, gamma):
             for topic in range(alpha.shape[0])
             for vocab_word in corpus.vocabulary
             if document_word == vocab_word
+            if phi[word_idx][topic] > 0
         )
         - loggamma(np.sum(gamma)) + np.sum(loggamma(gamma))
         - np.sum((gamma-1)*(digamma(gamma)-digamma(np.sum(gamma))))
-        - np.sum(phi * np.log(phi))
+        - sum(
+            value * np.log(value)
+            for row in phi
+            for value in row
+            if value > 0
+        )
     )
