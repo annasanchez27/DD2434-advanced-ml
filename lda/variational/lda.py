@@ -60,10 +60,10 @@ def lda(corpus: Corpus, num_topics=64, num_iterations=1024):
         ))
         lower_bound_evol.append(corpus_lower_bound(
             corpus=corpus, 
-            alpha=params["alpha"],
-            beta=params["beta"],
-            phis=params['phis'], 
-            gammas=params["gammas"]
+            alpha=params['alpha'],
+            beta=params['beta'],
+            phis=params['phis'],
+            gammas=params['gammas']
         ))
     return params, np.array(lower_bound_evol)
 
