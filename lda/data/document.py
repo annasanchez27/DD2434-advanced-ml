@@ -1,4 +1,6 @@
+from typing import List
 from collections import Counter
+from termcolor import colored
 from .word import Word
 from .nlp import nlp
 
@@ -35,6 +37,17 @@ class Document:
     @property
     def word_count(self):
         return Counter(self.included_words)
+    
+
+    def text(self, colors: List=None):
+        '''The reconstructed text of the document, with optional coloring'''
+        if colors is None:
+            colors = [None for word in self.words]
+        assert len(colors) == len(self.words)
+        return ' '.join(
+            colored(word.original_form, color)
+            for word, color in zip(self.words, colors)
+        )
 
 
     def __eq__(self, other):
