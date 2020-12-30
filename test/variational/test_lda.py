@@ -35,6 +35,8 @@ def test_lda():
         assert_numerically_ok(gamma_row)
         assert np.all(gamma_row > 0)
         assert np.all(gamma_row > params['alpha'])
+    
+    assert np.all(lower_bound_evol[1:] - lower_bound_evol[:-1] >= 0)
 
 
 please = Word('Please', 'please', include=True)
