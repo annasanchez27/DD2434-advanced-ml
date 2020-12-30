@@ -7,7 +7,7 @@ from utils import assert_numerically_ok
 
 
 def test_lda():
-    params = lda(corpus, num_topics=2, num_iterations=32)
+    params, lower_bound_evol = lda(corpus, num_topics=2, num_iterations=32)
     assert set(params.keys()) == {'alpha', 'beta', 'phis', 'gammas'}
     
     assert params['alpha'].shape == (2,)
@@ -35,6 +35,8 @@ def test_lda():
         assert_numerically_ok(gamma_row)
         assert np.all(gamma_row > 0)
         assert np.all(gamma_row > params['alpha'])
+    
+    assert np.all(lower_bound_evol[1:] - lower_bound_evol[:-1] >= 0)
 
 
 please = Word('Please', 'please', include=True)
