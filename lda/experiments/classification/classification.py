@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -44,12 +43,11 @@ def plot_classification_for_label(documents, label_name, show_fig, dest_dir, see
 
         y.append(np.mean(accuracies))
         yerr.append(np.var(accuracies))
-        print("Accuracy for training fraction ",
-              train_frac, ":", np.mean(accuracies))
+        print(f'Accuracy for training fraction {train_frac}: {np.mean(accuracies)}')
 
     plt.figure()
     plt.errorbar(train_data_fractions, y, yerr=yerr, label='Word features')
-    plt.title('Classification accuracy for ' + label_name + ' label')
+    plt.title(f'Classification accuracy for {label_name} label')
     plt.xlabel('Proportion of data used for training')
     plt.ylabel('Accuracy')
     plt.legend()
