@@ -5,6 +5,7 @@ from .e_step import e_step
 from .m_step import m_step
 from scipy.special import loggamma, digamma
 
+
 def lda(corpus: Corpus, num_topics=64, num_iterations=1024):
     '''
     Parameters:
@@ -33,30 +34,22 @@ def lda(corpus: Corpus, num_topics=64, num_iterations=1024):
             for topic in range(num_topics)
         ]
     }
+    params.update(e_step(
+        corpus=corpus,
+        alpha=params['alpha'],
+        beta=params['beta']
+    ))
     for iteration in trange(num_iterations):
-        variational_parameters = {
-            document: e_step(
-                document=document,
-                alpha=params['alpha'],
-                beta=params['beta']
-            )
-            for document in corpus.documents
-        } # {doc1: {'phi': 3, 'gamma': 2}, doc2: {...}}
-        params.update({
-            'phis': {
-                document: variational['phi']
-                for document, variational in variational_parameters.items()
-            },
-            'gammas': {
-                document: variational['gamma']
-                for document, variational in variational_parameters.items()
-            }
-        })
         params.update(m_step(
             corpus=corpus,
             alpha=params['alpha'],
             phis=params['phis'],
             gammas=params['gammas']
+        ))
+        params.update(e_step(
+            corpus=corpus,
+            alpha=params['alpha'],
+            beta=params['beta']
         ))
         lower_bound_evol.append(corpus_lower_bound(
             corpus=corpus, 
@@ -66,6 +59,11 @@ def lda(corpus: Corpus, num_topics=64, num_iterations=1024):
             gammas=params['gammas']
         ))
     return params, np.array(lower_bound_evol)
+
+
+def random_categorical_distribution(num_choices):
+    unnormalized = np.random.uniform(size=num_choices)
+    return unnormalized / np.sum(unnormalized)
 
 
 def corpus_lower_bound(corpus, alpha, beta, phis, gammas):
@@ -102,8 +100,3 @@ def document_lower_bound(corpus, document, alpha, beta, phi, gamma):
         - np.sum((gamma-1)*(digamma(gamma)-digamma(np.sum(gamma))))
         - np.sum(phi * np.log(phi))
     )
-
-
-def random_categorical_distribution(num_choices):
-    unnormalized = np.random.uniform(size=num_choices)
-    return unnormalized / np.sum(unnormalized)
