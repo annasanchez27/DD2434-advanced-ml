@@ -5,7 +5,7 @@ from lda.data.corpus import Corpus
 from lda.data.document import Document
 
 
-def e_step(corpus: Corpus, alpha: np.ndarray, beta):
+def calculate_e_step(corpus: Corpus, alpha: np.ndarray, beta):
     '''
     Parameters:
     * corpus: a Corpus object
@@ -18,7 +18,7 @@ def e_step(corpus: Corpus, alpha: np.ndarray, beta):
     }
     '''
     params = {
-        document: document_e_step(
+        document: document_phi_gamma(
             document=document,
             alpha=alpha,
             beta=beta,
@@ -37,7 +37,7 @@ def e_step(corpus: Corpus, alpha: np.ndarray, beta):
     }
 
 
-def document_e_step(document: Document, alpha: np.ndarray, beta):
+def document_phi_gamma(document: Document, alpha: np.ndarray, beta):
     '''
     Parameters:
     * document: a Document object
@@ -70,3 +70,39 @@ def document_e_step(document: Document, alpha: np.ndarray, beta):
         'phi': phi,
         'gamma': gamma,
     }
+
+#We need to calculate phis and gammas until convergence.
+#Once we have found the optimal parameters, lambda can be calculated.
+def calculate_lambdas(corpus: Corpus,alpha: np.ndarray, beta,eta: float):
+    '''
+    Parameters:
+    * Corpus: a Corpus object
+    * alpha: array of size (num_topics,)
+    * beta: beta[topic_id][word] = probability of word in topic
+        (word is a Word object here, so beta[topic_id] is a dictionary)
+    * eta: float
+
+    Returns: {
+        'lambda': array of size (num_topics, vocab),
+    }
+    '''
+
+
+    num_topics = len(beta)
+    vocab = corpus.vocabulary
+    lambda_vi = np.zeros(shape=(num_topics, vocab))
+    params = calculate_e_step(corpus,alpha,beta)
+    for i in range(num_topics):
+        for j in range(len(vocab)):
+            update_lambda(lambda_vi,i,j,params,eta)
+    return lambda_vi
+
+
+def update_lambda(lambda_vi, i, j,corpus,params,eta):
+    vocab = corpus.vocabulary
+    for document_idx, document in enumerate(corpus.documents):
+        for word_idx, word in enumerate(document.included_words):
+            if word == vocab[j]:
+                lambda_vi[i][j] += params['phis'][document][word_idx][i]
+    lambda_vi[i][j] += eta
+    return lambda_vi
