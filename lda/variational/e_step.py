@@ -50,7 +50,7 @@ def document_e_step(document: Document, alpha: np.ndarray, beta):
     }
     '''
     num_topics = len(beta)
-    phi = np.ones(shape=(len(document), num_topics), dtype=np.float128) / num_topics
+    phi = np.ones(shape=(len(document), num_topics)) / num_topics
     gamma = alpha + len(document) / num_topics
 
     # TODO: add max_iter param
