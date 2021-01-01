@@ -2,8 +2,8 @@ from lda.data.document import Document
 from lda.data.corpus import Corpus
 from lda.data.word import Word
 from lda import data
-import lda.experiments.classification.utils as utils
-import lda.experiments.classification.classification as classification
+import experiments.classification.utils as utils
+import experiments.classification.classification as classification
 import numpy as np
 
 test_data_fractions = [0.99, 0.95, 0.9, 0.8]
@@ -21,7 +21,7 @@ def test_classification_output_grain():
 
     for test_frac in test_data_fractions:
         accuracy = classification.classification_for_label(
-            corpus, "grain", '.', test_size=test_frac, save_labels=False)
+            corpus, "grain", test_size=test_frac, save_labels=False)
         assert accuracy == expected_accuracies[test_frac]
 
 
@@ -37,5 +37,5 @@ def test_classification_output_earn():
 
     for test_frac in test_data_fractions:
         accuracy = classification.classification_for_label(
-            corpus, "earn", '.', test_size=test_frac, save_labels=False)
+            corpus, "earn", test_size=test_frac, save_labels=False)
         assert accuracy == expected_accuracies[test_frac]
