@@ -50,7 +50,7 @@ def document_e_step(document: Document, alpha: np.ndarray, beta):
     }
     '''
     num_topics = len(beta)
-    phi = np.ones(shape=(len(document), num_topics)) / num_topics
+    phi = np.ones(shape=(len(document), num_topics), dtype=np.float128) / num_topics
     gamma = alpha + len(document) / num_topics
 
     # TODO: add max_iter param
@@ -61,6 +61,7 @@ def document_e_step(document: Document, alpha: np.ndarray, beta):
                     beta[topic][word]
                     * np.exp(digamma(gamma[topic]))
                 )
+                assert not np.isnan(phi[word_idx, topic]) 
             phi[word_idx] /= phi[word_idx].sum()
         new_gamma = alpha + phi.sum(axis=0)
         if np.all(np.isclose(gamma, new_gamma)):
