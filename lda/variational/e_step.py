@@ -62,6 +62,7 @@ def document_e_step(document: Document, alpha: np.ndarray, beta):
                     * np.exp(digamma(gamma[topic]))
                 )
             phi[word_idx] /= phi[word_idx].sum()
+            assert not np.isnan(phi[word_idx]) 
         new_gamma = alpha + phi.sum(axis=0)
         if np.all(np.isclose(gamma, new_gamma)):
             break
