@@ -3,6 +3,7 @@ import numpy as np
 from scipy.special import digamma
 from lda.data.corpus import Corpus
 from lda.data.document import Document
+from .constants import E_STEP_MAX_ITERS
 
 
 def e_step(corpus: Corpus, alpha: np.ndarray, beta):
@@ -53,7 +54,7 @@ def document_e_step(document: Document, alpha: np.ndarray, beta):
     phi = np.ones(shape=(len(document), num_topics)) / num_topics
     gamma = alpha + len(document) / num_topics
 
-    for step in itertools.count():
+    for step in range(E_STEP_MAX_ITERS):
         for word_idx, word in enumerate(document.included_words):
             for topic in range(num_topics):
                 phi[word_idx, topic] = (
