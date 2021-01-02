@@ -22,7 +22,7 @@ class Corpus:
 
     @property
     def vocabulary(self):
-        return set(self.word_count)
+        return list(self.word_count)
     
 
     @property
