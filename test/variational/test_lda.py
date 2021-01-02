@@ -4,10 +4,12 @@ from lda.data.corpus import Corpus
 from lda.data.document import Document
 from lda.data.word import Word
 from utils import assert_numerically_ok
+import lda.utils as utils
 
 
 def test_lda():
-    params, lower_bound_evol = lda(corpus, num_topics=2, num_iterations=32)
+    with utils.np_seed(62):
+        params, lower_bound_evol = lda(corpus, num_topics=2, num_iterations=32)
     assert set(params.keys()) == {'alpha', 'beta', 'phis', 'gammas'}
     
     assert params['alpha'].shape == (2,)
