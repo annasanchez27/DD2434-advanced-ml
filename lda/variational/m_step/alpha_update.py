@@ -5,9 +5,14 @@ from lda.data.document import Document
 from lda.utils import guarded_polygamma
 
 
-def alpha_update(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], num_iterations=1024):
+def alpha_update(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], num_iterations=32):
+    converged  = False
     for iteration in range(num_iterations):
         alpha = step(alpha=alpha, gammas=gammas)
+        if maximum_found(alpha, gammas):
+            converged = True
+            break
+    assert converged  
     return alpha
 
 
@@ -60,3 +65,12 @@ def gradient(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], topic: int):
             for document, gamma in gammas.items()
         )
     )
+
+# checks if the gradient of the lower bound alpha function is close to zero 
+# (last page of the appendix)
+def maximum_found(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], thres=1e-10):
+    max_found = True
+    for i in range(len(alpha)):
+        grad = gradient(alpha, gammas, i)
+        max_found = max_found and abs(grad) < thres
+    return max_found
