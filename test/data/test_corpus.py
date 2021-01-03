@@ -4,11 +4,11 @@ from lda.data.word import Word
 
 
 def test_vocabulary():
-    assert corpus.vocabulary == {
+    assert corpus.vocabulary == [
         please,
         crash,
         grandma
-    }
+    ]
 
 
 def test_word_count():
