@@ -9,7 +9,9 @@ import lda.utils as utils
 
 def test_lda():
     with utils.np_seed(62):
-        params, lower_bound_evol = lda(corpus, num_topics=2, num_iterations=32)
+        out = lda(corpus, num_topics=2, num_iterations=32)
+        params = out['params']
+        lower_bound_evol = out['lower_bound_evol']
     assert set(params.keys()) == {'alpha', 'beta', 'phis', 'gammas'}
     
     assert params['alpha'].shape == (2,)

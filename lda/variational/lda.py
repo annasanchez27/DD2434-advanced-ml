@@ -6,7 +6,7 @@ from .m_step import m_step
 from scipy.special import loggamma, digamma
 
 
-def lda(corpus: Corpus, num_topics=64, num_iterations=1024):
+def lda(corpus: Corpus, num_topics=64, num_iterations=1024, max_attempts=1024):
     '''
     Parameters:
     * corpus: a Corpus object
@@ -22,6 +22,19 @@ def lda(corpus: Corpus, num_topics=64, num_iterations=1024):
             (document is a Document object, so gammas is a dictionary)
     }
     '''
+    for attempt in range(max_attempts):
+        try:
+            return lda_single_attempt(
+                corpus=corpus,
+                attempt_number=attempt,
+                num_topics=num_topics,
+                num_iterations=num_iterations
+            )
+        except AssertionError:
+            pass # something went wrong with the math
+
+
+def lda_single_attempt(corpus: Corpus, attempt_number, num_topics=64, num_iterations=1024):
     lower_bound_evol = []
     vocab = corpus.vocabulary
     params = {
@@ -39,26 +52,47 @@ def lda(corpus: Corpus, num_topics=64, num_iterations=1024):
         alpha=params['alpha'],
         beta=params['beta']
     ))
-    for iteration in trange(num_iterations):
-        params.update(m_step(
-            corpus=corpus,
-            alpha=params['alpha'],
-            phis=params['phis'],
-            gammas=params['gammas']
-        ))
-        params.update(e_step(
-            corpus=corpus,
-            alpha=params['alpha'],
-            beta=params['beta']
-        ))
-        lower_bound_evol.append(corpus_lower_bound(
-            corpus=corpus, 
-            alpha=params['alpha'],
-            beta=params['beta'],
-            phis=params['phis'],
-            gammas=params['gammas']
-        ))
-    return params, np.array(lower_bound_evol)
+    for iteration in trange(num_iterations, desc=f'Attempt {attempt_number}'):
+        out = lda_step(corpus=corpus, params=params)
+        params = out['params']
+        assert not np.isnan(out['lower_bound'])
+        if len(lower_bound_evol) > 0:
+            assert out['lower_bound'] >= lower_bound_evol[-1]
+        lower_bound_evol.append(out['lower_bound'])
+    return {
+        'params': params,
+        'lower_bound_evol': np.array(lower_bound_evol)
+    }
+
+
+def lda_step(corpus: Corpus, params: dict):
+        params = {
+            **params,
+            **m_step(
+                corpus=corpus,
+                alpha=params['alpha'],
+                phis=params['phis'],
+                gammas=params['gammas']
+            )
+        }
+        params = {
+            **params,
+            **e_step(
+                corpus=corpus,
+                alpha=params['alpha'],
+                beta=params['beta']
+            )
+        }
+        return {
+            'params': params,
+            'lower_bound': corpus_lower_bound(
+                corpus=corpus, 
+                alpha=params['alpha'],
+                beta=params['beta'],
+                phis=params['phis'],
+                gammas=params['gammas']
+            )
+        }
 
 
 def random_categorical_distribution(num_choices):
