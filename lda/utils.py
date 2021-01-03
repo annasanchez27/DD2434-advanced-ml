@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.special import polygamma
 
 
 class np_seed:
@@ -13,3 +14,9 @@ class np_seed:
 
     def __exit__(self, exc_type, exc_value, traceback):
         np.random.set_state(self.old_state)
+
+
+def guarded_polygamma(x):
+    '''Computes polygamma(1, x), but makes sure that x isn't numerically bonkers'''
+    assert np.all(np.abs(x) < 1000)
+    return polygamma(1, x)

@@ -1,7 +1,8 @@
 from typing import Dict
 import numpy as np
-from scipy.special import loggamma, digamma, polygamma
+from scipy.special import loggamma, digamma
 from lda.data.document import Document
+from lda.utils import guarded_polygamma
 
 
 def alpha_update(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], num_iterations=1024):
@@ -42,12 +43,12 @@ def magic_constant(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], h: np.
 
 def hessian_constant(alpha: np.ndarray, gammas: Dict[Document, np.ndarray]):
     '''Scalar. Referred to as z in the paper.'''
-    return len(gammas) * polygamma(1, np.sum(alpha))
+    return len(gammas) * guarded_polygamma(np.sum(alpha))
 
 
 def hessian_diagonal(alpha: np.ndarray, gammas: Dict[Document, np.ndarray]):
     '''Vector of shape (num_topics,). Referred to as h in the paper.'''
-    return -len(gammas) * polygamma(1, alpha)
+    return -len(gammas) * guarded_polygamma(alpha)
 
 
 def gradient(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], topic: int):
