@@ -12,8 +12,7 @@ def alpha_update(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], num_iter
         if maximum_found(alpha, gammas):
             converged = True
             break
-    if not converged:
-        print("not converged")
+    assert converged  
     return alpha
 
 
