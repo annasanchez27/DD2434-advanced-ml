@@ -23,15 +23,12 @@ def lda(corpus: Corpus, num_topics=64, num_iterations=1024, max_attempts=1024):
     }
     '''
     for attempt in range(max_attempts):
-        try:
-            return lda_single_attempt(
-                corpus=corpus,
-                attempt_number=attempt,
-                num_topics=num_topics,
-                num_iterations=num_iterations
-            )
-        except AssertionError:
-            pass # something went wrong with the math
+        return lda_single_attempt(
+            corpus=corpus,
+            attempt_number=attempt,
+            num_topics=num_topics,
+            num_iterations=num_iterations
+        )
 
 
 def lda_single_attempt(corpus: Corpus, attempt_number, num_topics=64, num_iterations=1024):

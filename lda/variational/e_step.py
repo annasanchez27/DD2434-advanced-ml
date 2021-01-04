@@ -1,6 +1,6 @@
 import itertools
 import numpy as np
-from scipy.special import digamma
+from lda.utils import guarded_digamma
 from lda.data.corpus import Corpus
 from lda.data.document import Document
 from .constants import E_STEP_MAX_ITERS
@@ -59,7 +59,7 @@ def document_e_step(document: Document, alpha: np.ndarray, beta):
             for topic in range(num_topics):
                 phi[word_idx, topic] = (
                     beta[topic][word]
-                    * np.exp(digamma(gamma[topic]))
+                    * np.exp(guarded_digamma(gamma[topic]))
                 )
                 assert not np.isnan(phi[word_idx, topic])
             phi[word_idx] /= phi[word_idx].sum()

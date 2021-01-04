@@ -1,19 +1,24 @@
 from typing import Dict
 import numpy as np
-from scipy.special import loggamma, digamma
+from scipy.special import loggamma, digamma, polygamma
 from lda.data.document import Document
 from lda.utils import guarded_polygamma
+from lda.utils import guarded_digamma
 
 
 def alpha_update(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], num_iterations=32):
-    converged  = False
+    converged = False
+    alpha_old = alpha.copy()
     for iteration in range(num_iterations):
-        alpha = step(alpha=alpha, gammas=gammas)
-        if maximum_found(alpha, gammas):
+        alpha_new = step(alpha=alpha_old, gammas=gammas)
+        if np.any(alpha_new < 0):
+            return alpha_old
+        if maximum_found(alpha_new, gammas):
             converged = True
             break
-    assert converged  
-    return alpha
+        alpha_old = alpha_new
+    assert converged
+    return alpha_new
 
 
 def step(alpha: np.ndarray, gammas: Dict[Document, np.ndarray]):
@@ -59,14 +64,14 @@ def hessian_diagonal(alpha: np.ndarray, gammas: Dict[Document, np.ndarray]):
 def gradient(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], topic: int):
     '''Scalar - gradient of a single topic in alpha'''
     return (
-        len(gammas) * (digamma(alpha.sum()) - digamma(alpha[topic]))
+        len(gammas) * (guarded_digamma(alpha.sum()) - guarded_digamma(alpha[topic]))
         + sum(
-            digamma(gamma[topic]) - digamma(gamma.sum())
+            guarded_digamma(gamma[topic]) - guarded_digamma(gamma.sum())
             for document, gamma in gammas.items()
         )
     )
 
-# checks if the gradient of the lower bound alpha function is close to zero 
+# checks if the gradient of the lower bound alpha function is close to zero
 # (last page of the appendix)
 def maximum_found(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], thres=1e-10):
     max_found = True
