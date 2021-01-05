@@ -1,6 +1,6 @@
 import itertools
 import numpy as np
-from lda.utils import guarded_digamma
+from lda.utils import normalize, guarded_digamma
 from lda.data.corpus import Corpus
 from lda.data.document import Document
 from .constants import E_STEP_MAX_ITERS
@@ -59,7 +59,7 @@ def document_e_step(corpus: Corpus, document: Document, alpha: np.ndarray, beta)
             * np.exp(guarded_digamma(gamma)) # (num_topics,)
         )
         assert np.all(~np.isnan(phi))
-        phi /= np.expand_dims(phi.sum(axis=1), axis=-1)
+        phi = normalize(phi, axis=1)
         assert np.all(np.isclose(phi.sum(axis=1), 1))
         new_gamma = alpha + phi.sum(axis=0)
         if np.all(np.isclose(gamma, new_gamma)):

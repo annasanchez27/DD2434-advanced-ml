@@ -4,6 +4,7 @@ from lda.data.corpus import Corpus
 from .e_step import e_step
 from .m_step import m_step
 from scipy.special import loggamma, digamma
+from lda.utils import normalize
 
 
 def lda(corpus: Corpus, num_topics=64, num_iterations=1024, max_attempts=1024):
@@ -32,10 +33,9 @@ def lda(corpus: Corpus, num_topics=64, num_iterations=1024, max_attempts=1024):
 def lda_single_attempt(corpus: Corpus, attempt_number, num_topics=64, num_iterations=1024):
     lower_bound_evol = []
     vocab = corpus.vocabulary
-    beta_init = np.random.uniform(size=(num_topics, len(vocab)))
     params = {
         'alpha': np.random.uniform(size=num_topics),
-        'beta': beta_init / np.expand_dims(beta_init.sum(axis=1), axis=-1)
+        'beta': normalize(np.random.uniform(size=(num_topics, len(vocab))), axis=1)
     }
     params.update(e_step(
         corpus=corpus,
