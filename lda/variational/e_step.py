@@ -11,8 +11,7 @@ def e_step(corpus: Corpus, alpha: np.ndarray, beta):
     Parameters:
     * corpus: a Corpus object
     * alpha: array of size (num_topics,)
-    * beta: beta[topic_id][word] = probability of word in topic
-        (word is a Word object here, so beta[topic_id] is a dictionary)
+    * beta: beta[topic_id][word_id] = probability of word in topic
     Returns: {
         'phis': {document: array of size (document_length, num_topics)},
         'gamma': {document: array of size (num_topics,)},
@@ -20,6 +19,7 @@ def e_step(corpus: Corpus, alpha: np.ndarray, beta):
     '''
     params = {
         document: document_e_step(
+            corpus=corpus,
             document=document,
             alpha=alpha,
             beta=beta,
@@ -38,13 +38,12 @@ def e_step(corpus: Corpus, alpha: np.ndarray, beta):
     }
 
 
-def document_e_step(document: Document, alpha: np.ndarray, beta):
+def document_e_step(corpus: Corpus, document: Document, alpha: np.ndarray, beta):
     '''
     Parameters:
     * document: a Document object
     * alpha: array of size (num_topics,)
-    * beta: beta[topic_id][word] = probability of word in topic
-        (word is a Word object here, so beta[topic_id] is a dictionary)
+    * beta: beta[topic_id][word_id] = probability of word in topic
     Returns: {
         'phi': array of size (document_length, num_topics),
         'gamma': array of size (num_topics,),
@@ -55,14 +54,13 @@ def document_e_step(document: Document, alpha: np.ndarray, beta):
     gamma = alpha + len(document) / num_topics
 
     for step in range(E_STEP_MAX_ITERS):
-        for word_idx, word in enumerate(document.included_words):
-            for topic in range(num_topics):
-                phi[word_idx, topic] = (
-                    beta[topic][word]
-                    * np.exp(guarded_digamma(gamma[topic]))
-                )
-                assert not np.isnan(phi[word_idx, topic])
-            phi[word_idx] /= phi[word_idx].sum()
+        phi = (
+            beta[:, corpus.vocabulary_indices[document]].transpose() # (document_length, num_topics)
+            * np.exp(guarded_digamma(gamma)) # (num_topics,)
+        )
+        assert np.all(~np.isnan(phi))
+        phi /= np.expand_dims(phi.sum(axis=1), axis=-1)
+        assert np.all(np.isclose(phi.sum(axis=1), 1))
         new_gamma = alpha + phi.sum(axis=0)
         if np.all(np.isclose(gamma, new_gamma)):
             break

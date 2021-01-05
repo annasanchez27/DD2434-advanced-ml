@@ -106,20 +106,6 @@ def document_lower_bound(corpus, document, alpha, beta, phi, gamma):
         loggamma(alpha.sum()) - loggamma(alpha).sum()
         + np.sum((alpha - 1) * supergamma)
         + np.sum(phi * supergamma)
-        # + sum(
-        #     phi[idx_in_doc, topic] * np.log(beta[topic, idx_in_vocab])
-        #     for idx_in_doc, document_word in enumerate(document.included_words)
-        #     for topic in range(alpha.shape[0])
-        #     for idx_in_vocab, vocab_word in enumerate(corpus.vocabulary)
-        #     if document_word == vocab_word
-        #     if phi[idx_in_doc][topic] > 0
-        # )
-        # + sum(
-        #     phi[idx_in_doc, topic] * np.log(beta[topic, corpus.vocabulary_indices[document][idx_in_doc]])
-        #     for idx_in_doc, document_word in enumerate(document.included_words)
-        #     for topic in range(alpha.shape[0])
-        #     if phi[idx_in_doc][topic] > 0
-        # )
         + np.sum(
             phi.transpose([1, 0]) * np.log(beta[:, corpus.vocabulary_indices[document]])
         ) # we pray that this works
