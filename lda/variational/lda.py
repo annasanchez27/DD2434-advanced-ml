@@ -22,12 +22,15 @@ def lda(corpus: Corpus, num_topics=64, num_iterations=1024, max_attempts=1024):
     '''
     # TODO: maybe gammas should be a numpy array in its entirety?
     for attempt in range(max_attempts):
-        return lda_single_attempt(
-            corpus=corpus,
-            attempt_number=attempt,
-            num_topics=num_topics,
-            num_iterations=num_iterations
-        )
+        try:
+            return lda_single_attempt(
+                corpus=corpus,
+                attempt_number=attempt,
+                num_topics=num_topics,
+                num_iterations=num_iterations
+            )
+        except AssertionError as ass_err:
+            print(f'Recieved {ass_err}, trying again')
 
 
 def lda_single_attempt(corpus: Corpus, attempt_number, num_topics=64, num_iterations=1024):
