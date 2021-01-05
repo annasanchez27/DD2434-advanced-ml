@@ -38,7 +38,7 @@ def lda_single_attempt(corpus: Corpus, attempt_number, num_topics=64, num_iterat
     lower_bound_evol = []
     vocab = corpus.vocabulary
     params = {
-        'alpha': np.random.uniform(size=num_topics),
+        'alpha': np.random.uniform(low=.5, high=5, size=num_topics),
         'beta': normalize(np.random.uniform(size=(num_topics, len(vocab))), axis=1)
     }
     params.update(e_step(
