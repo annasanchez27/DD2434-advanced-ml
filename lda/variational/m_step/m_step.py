@@ -17,8 +17,7 @@ def m_step(corpus: Corpus, alpha: np.ndarray, phis: Dict[Document, np.ndarray], 
         (document is a Document object, so gammas is a dictionary)
     Returns: {
         'alpha': array of size (num_topics,)
-        'beta': beta[topic_id][word] = probability of word in topic
-            (word is a Word object, so beta[topic_id] is a dictionary)
+        'beta': beta[topic_id][word_id] = probability of word in topic
     }
     '''
     return {
