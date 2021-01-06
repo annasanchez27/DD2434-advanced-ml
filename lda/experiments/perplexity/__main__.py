@@ -1,3 +1,6 @@
+
+import sys 
+sys.path.append("../../../")
 import collections
 import numpy as np
 import argparse
@@ -66,11 +69,11 @@ def plsa_probability(docs_num, topics_num, doc, word_given_topic, topic_given_do
                 else:
                     topic_sum += word_given_topic[topic_iter][word] * \
                         topic_given_doc[doc_iter, topic_iter]
-                train_doc_probability *= topic_sum
+            train_doc_probability *= topic_sum
         doc_probability += train_doc_probability  # / docs_num THIS SHOULD BE UNCOMMENTED once train_doc_probability is not zero
     print(doc_probability)
 
-
+"""
 def main():
     reuters_corpus = data.reuters
     all_documents = reuters_corpus.documents
@@ -119,3 +122,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+"""
