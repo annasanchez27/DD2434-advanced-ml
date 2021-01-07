@@ -12,6 +12,7 @@ spacy = "^2.3.5"
 scikit-learn = "^0.23.2"
 matplotlib = "^3.3.3"
 scipy = "^1.5.4"
+termcolor = "^1.1.0"
 [tool.poetry.dependencies.en_core_web_md]
 url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-2.3.1/en_core_web_md-2.3.1.tar.gz"
 
@@ -22,6 +23,7 @@ pytest = "^6.2.1"
 jupyter = "^1.0.0"
 tqdm = "^4.54.1"
 matplotlib = "^3.3.3"
+plotly = "^4.14.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

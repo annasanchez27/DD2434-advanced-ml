@@ -25,11 +25,22 @@ def test_alpha():
 
 def test_beta():
     beta = beta_update(corpus=corpus, phis=phis)
+<<<<<<< HEAD
     assert len(beta) == 2
     assert beta == [
         {please: 1, crash: 0, grandma: 0},
         {please: 0, crash: .5, grandma: .5},
     ]
+=======
+    assert beta.shape == (2, 3)
+    assert np.all(np.isclose(
+        beta,
+        [
+            [1, 0, 0],
+            [0, .5, .5],
+        ]
+    ))
+>>>>>>> 745375531ad5b7ae49dcd52d443f79d110aee2b9
 
 
 please = Word('Please', 'please', include=True)
