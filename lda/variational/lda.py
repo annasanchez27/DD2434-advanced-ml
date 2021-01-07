@@ -50,8 +50,6 @@ def lda_single_attempt(corpus: Corpus, attempt_number, num_topics=64, num_iterat
         out = lda_step(corpus=corpus, params=params)
         params = out['params']
         assert not np.isnan(out['lower_bound'])
-        if len(lower_bound_evol) > 0:
-            assert out['lower_bound'] >= lower_bound_evol[-1]
         lower_bound_evol.append(out['lower_bound'])
     return {
         'params': params,
