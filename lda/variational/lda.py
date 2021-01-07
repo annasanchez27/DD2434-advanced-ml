@@ -6,6 +6,7 @@ from .e_step import e_step
 from .m_step import m_step
 from scipy.special import loggamma, digamma
 from lda.utils import normalize
+from .constants import LOWER_BOUND_THRESHOLD
 
 
 def lda(corpus: Corpus, num_topics=64, num_iterations=1024, max_attempts=1024):
