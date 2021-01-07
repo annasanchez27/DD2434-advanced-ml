@@ -16,6 +16,10 @@ class np_seed:
         np.random.set_state(self.old_state)
 
 
+def normalize(to_normalize: np.ndarray, axis=-1):
+    return to_normalize / np.expand_dims(to_normalize.sum(axis=axis), axis=axis)
+
+
 def guarded_polygamma(x):
     '''Computes polygamma(1, x), but makes sure that x isn't numerically bonkers'''
     assert np.all(x > 0)
