@@ -35,7 +35,7 @@ def docs_to_wordcount_dicts(documents):
     return all_wordcounts
 
 
-def docs_to_features(X_train_docs, X_test_docs, test_size):
+def docs_to_features(X_train_docs, X_test_docs):
     vec = DictVectorizer()
     tt = TfidfTransformer(use_idf=False)
 
@@ -46,4 +46,33 @@ def docs_to_features(X_train_docs, X_test_docs, test_size):
     wordcounts_matrix = vec.transform(wordcount_dicts).toarray()
     X_test = tt.transform(wordcounts_matrix)
 
+    return X_train, X_test
+
+# TODO: combine below two
+
+
+def phis_docs_to_topiccounts(phis, docs):
+    topiccounts = []
+
+    for doc in X_train_docs:
+        topiccounts.append(np.sum(phis[doc], axis=0))
+
+    return topiccounts
+
+
+def phis_to_topiccounts(phis):
+    all_topiccounts = []
+    for phi in phis:
+        all_topiccounts.append(np.sum(phi, axis=0))
+
+    return all_topiccounts
+
+
+def phis_to_features(phis, X_train_docs, X_test_docs):
+    tt = TfidfTransformer(use_idf=False)
+
+    train_topiccounts = phis_docs_to_topiccounts(phis, X_train_docs)
+    test_topiccounts = phis_docs_to_topiccounts(phis, X_test_docs)
+    X_train = tt.fit_transform(train_topiccounts)
+    X_test = tt.transform(test_topiccounts)
     return X_train, X_test
