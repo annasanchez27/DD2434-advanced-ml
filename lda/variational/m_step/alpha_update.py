@@ -10,10 +10,11 @@ def alpha_update(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], num_iter
     converged = False
     alpha_old = alpha.copy()
     for iteration in range(num_iterations):
-        alpha_new = step(alpha=alpha_old, gammas=gammas)
+        gradients = all_gradients(alpha_old, gammas)
+        alpha_new = step(alpha=alpha_old, gammas=gammas, gradients=gradients)
         if np.any(alpha_new < 0):
             return alpha_old
-        if maximum_found(alpha_new, gammas):
+        if maximum_found(alpha_new, gammas, gradients):
             converged = True
             break
         alpha_old = alpha_new
@@ -21,27 +22,23 @@ def alpha_update(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], num_iter
     return alpha_new
 
 
-def step(alpha: np.ndarray, gammas: Dict[Document, np.ndarray]):
+def step(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], gradients):
     h = hessian_diagonal(alpha=alpha, gammas=gammas)
-    c = magic_constant(alpha=alpha, gammas=gammas, h=h)
+    c = magic_constant(alpha=alpha, gammas=gammas, h=h, gradients=gradients)
     return alpha - np.array([
         (
-            gradient(alpha=alpha, gammas=gammas, topic=topic)
+            gradients[topic]
             - c
         ) / h[topic]
         for topic in range(alpha.shape[0])
     ])
 
 
-def magic_constant(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], h: np.ndarray):
+def magic_constant(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], h: np.ndarray, gradients):
     '''Referred to as c in the paper.'''
     return (
         sum(
-            gradient(
-                alpha=alpha,
-                gammas=gammas,
-                topic=topic
-            ) / h[topic]
+            gradients[topic] / h[topic]
             for topic in range(alpha.shape[0])
         )
         / (
@@ -61,21 +58,22 @@ def hessian_diagonal(alpha: np.ndarray, gammas: Dict[Document, np.ndarray]):
     return -len(gammas) * guarded_polygamma(alpha)
 
 
-def gradient(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], topic: int):
-    '''Scalar - gradient of a single topic in alpha'''
-    return (
-        len(gammas) * (guarded_digamma(alpha.sum()) - guarded_digamma(alpha[topic]))
-        + sum(
-            guarded_digamma(gamma[topic]) - guarded_digamma(gamma.sum())
-            for document, gamma in gammas.items()
+def all_gradients(alpha: np.ndarray, gammas: Dict[Document, np.ndarray]):
+    '''List - gradient for each topic in alpha'''
+    return [
+        (
+            len(gammas) * (guarded_digamma(alpha.sum()) - guarded_digamma(alpha[topic]))
+            + sum(
+                guarded_digamma(gamma[topic]) - guarded_digamma(gamma.sum())
+                for document, gamma in gammas.items())
         )
-    )
+        for topic in range(alpha.shape[0])
+    ]
 
 # checks if the gradient of the lower bound alpha function is close to zero
 # (last page of the appendix)
-def maximum_found(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], thres=1e-10):
+def maximum_found(alpha: np.ndarray, gammas: Dict[Document, np.ndarray], gradients, thres=1e-10):
     max_found = True
     for i in range(len(alpha)):
-        grad = gradient(alpha, gammas, i)
-        max_found = max_found and abs(grad) < thres
+        max_found = max_found and abs(gradients[i]) < thres
     return max_found
