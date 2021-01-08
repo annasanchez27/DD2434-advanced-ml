@@ -53,8 +53,7 @@ def plot_classification_for_label(documents, label_name, seed_num=3, save_labels
             label_filename = label_name + '_labels.npy'
             label_file = Path(os.path.join(DATA_DIR, label_filename))
             if save_labels:
-                # TODO: change to not ...
-                if label_file.is_file():
+                if not label_file.is_file():
                     labels = topic_to_labels(label_name, documents)
                     np.save(os.path.join(DATA_DIR, label_filename), labels)
                 else:

@@ -5,6 +5,7 @@ from lda import data
 import experiments.classification.utils as utils
 import experiments.classification.classification as classification
 import numpy as np
+from sklearn.model_selection import train_test_split
 
 test_data_fractions = [0.99, 0.95, 0.9, 0.8]
 
@@ -18,10 +19,13 @@ def test_classification_output_grain():
     }
     reuters_corpus = data.reuters
     corpus = utils.corpus_to_documents_with_topics(reuters_corpus)
+    labels = utils.topic_to_labels("grain", corpus)
 
     for test_frac in test_data_fractions:
+        X_train_docs, X_test_docs, y_train, y_test = train_test_split(
+            corpus, labels, test_size=test_frac, random_state=42)
         accuracy = classification.classification_for_label(
-            corpus, "grain", test_size=test_frac, save_labels=False)
+            X_train_docs, X_test_docs, y_train, y_test, test_size=test_frac)
         assert accuracy == expected_accuracies[test_frac]
 
 
@@ -34,8 +38,11 @@ def test_classification_output_earn():
     }
     reuters_corpus = data.reuters
     corpus = utils.corpus_to_documents_with_topics(reuters_corpus)
+    labels = utils.topic_to_labels("earn", corpus)
 
     for test_frac in test_data_fractions:
+        X_train_docs, X_test_docs, y_train, y_test = train_test_split(
+            corpus, labels, test_size=test_frac, random_state=42)
         accuracy = classification.classification_for_label(
-            corpus, "earn", test_size=test_frac, save_labels=False)
+            X_train_docs, X_test_docs, y_train, y_test, test_size=test_frac)
         assert accuracy == expected_accuracies[test_frac]
