@@ -1,13 +1,14 @@
 
 import sys
-from lda.experiments.perplexity.utils import docs_to_strings
+from .utils import docs_to_strings
 from plsa.pipeline import DEFAULT_PIPELINE
 from plsa.preprocessors import tokenize
 from plsa.pipeline import Pipeline
 from plsa.corpus import Corpus
 from plsa.algorithms.conditional_plsa import ConditionalPLSA
-from lda.data.document import Document
+from lda.data.corpus import Corpus
 from lda.data.word import Word
+from lda.utils import np_seed
 from lda import data
 from lda import lda
 import os
@@ -16,6 +17,7 @@ import numpy as np
 import collections
 import sys
 import matplotlib.pyplot as plt
+from scipy.special import loggamma, digamma
 sys.path.append("../../../")
 
 DATA_DIR = os.path.join(os.path.dirname(__file__),
@@ -121,6 +123,24 @@ def plsa_perplexity(train_docs, test_docs, topics_num, total_words, plsa_corpus)
     return np.exp(-logsum/total_words)
 
 
+def document_lower_bound(corpus, document, alpha, beta, phi, gamma):
+    '''Eq. 15 on the paper. Lower bound to maximize for a document'''
+    supergamma = digamma(gamma) - digamma(gamma.sum())
+    return (
+        loggamma(alpha.sum()) - loggamma(alpha).sum()
+        + np.sum((alpha - 1) * supergamma)
+        + np.sum(phi * supergamma)
+        + np.sum(
+            phi.transpose([1, 0]) * np.log(beta[:, corpus.vocabulary_indices[document]])
+        ) # we pray that this works
+        - loggamma(gamma.sum()) + loggamma(gamma).sum()
+        - np.sum((gamma - 1) * supergamma)
+        - np.sum(
+            phi[phi > 0] * np.log(phi[phi > 0])
+        )
+    )
+
+
 def main():
     all_documents = data.reuters.documents
 
@@ -137,31 +157,39 @@ def main():
     for doc in X_test:
         total_words += sum(doc.word_count.values())
 
-    smoothed_unigram = unigram(X_train)
-    uni_perplexity = unigram_perplexity(smoothed_unigram, X_test, total_words)
-    print(uni_perplexity)
+    print(total_words)
 
-    X_train_strings = docs_to_strings(X_train)
-    X_test_strings = docs_to_strings(X_test)
+    train_corpus = Corpus(X_train)
+    with np_seed(123):
+        result = lda(train_corpus, num_topics=2, num_iterations=32)
 
-    plsa_corpus = Corpus(X_train_strings, Pipeline(tokenize))
-
-    num_topics = [2, 5, 10, 15, 25]
-    plsa_perp_list = []
-    for num_topic in num_topics:
-        print('topic', num_topic)
-        perp = plsa_perplexity(
-            X_train_strings, X_test_strings, num_topic, total_words, plsa_corpus)
-        plsa_perp_list.append(perp)
-        print(perp)
-
-    uni_perp_list = [uni_perplexity for _ in range(len(num_topics))]
-    plt.plot(num_topics, uni_perp_list, label='Smoothed unigram')
-    plt.plot(num_topics, plsa_perp_list, label='pLSI')
-    plt.legend()
-    plt.xlabel('Number of Topics')
-    plt.ylabel('Perplexity')
+    plt.plot(result['lower_bound_evol'])
     plt.show()
+    # smoothed_unigram = unigram(X_train)
+    # uni_perplexity = unigram_perplexity(smoothed_unigram, X_test, total_words)
+    # print(uni_perplexity)
+
+    # X_train_strings = docs_to_strings(X_train)
+    # X_test_strings = docs_to_strings(X_test)
+
+    # plsa_corpus = Corpus(X_train_strings, Pipeline(tokenize))
+
+    # num_topics = [2, 5, 10, 15, 25]
+    # plsa_perp_list = []
+    # for num_topic in num_topics:
+    #     print('topic', num_topic)
+    #     perp = plsa_perplexity(
+    #         X_train_strings, X_test_strings, num_topic, total_words, plsa_corpus)
+    #     plsa_perp_list.append(perp)
+    #     print(perp)
+
+    # uni_perp_list = [uni_perplexity for _ in range(len(num_topics))]
+    # plt.plot(num_topics, uni_perp_list, label='Smoothed unigram')
+    # plt.plot(num_topics, plsa_perp_list, label='pLSI')
+    # plt.legend()
+    # plt.xlabel('Number of Topics')
+    # plt.ylabel('Perplexity')
+    # plt.show()
 
 
 if __name__ == "__main__":
