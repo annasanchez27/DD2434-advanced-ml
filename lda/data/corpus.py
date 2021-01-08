@@ -1,4 +1,4 @@
-from functools import reduce
+from functools import reduce, cached_property
 from collections import Counter
 
 
@@ -20,7 +20,24 @@ class Corpus:
         )
     
 
-    @property
+    @cached_property
+    def vocabulary_indices(self):
+        '''{document: list of vocabulary indices of the document's included words}'''
+        return {
+            document: [
+                self.vocabulary.index(word)
+                for word in document.included_words
+            ]
+            for document in self.documents
+        }
+    
+
+    @cached_property
+    def vocabulary(self):
+        return list(self.word_count)
+    
+
+    @cached_property
     def word_count(self):
         return Counter(
             word

@@ -2,8 +2,8 @@ from lda.data.document import Document
 from lda.data.corpus import Corpus
 from lda.data.word import Word
 from lda import data
-import lda.experiments.classification.utils as utils
-import lda.experiments.classification.classification as classification
+import experiments.classification.utils as utils
+import experiments.classification.classification as classification
 import numpy as np
 
 
@@ -70,8 +70,8 @@ def test_corpus_with_topics():
     docs_with_topics = utils.corpus_to_documents_with_topics(corpus)
 
     assert len(docs_with_topics) == len(expected_docs_with_topics)
-    # for i, doc in enumerate(docs_with_topics):
-    #   assert doc == expected_docs_with_topics[i]
+    for i, doc in enumerate(docs_with_topics):
+        assert doc == expected_docs_with_topics[i]
 
 
 def test_topic_to_labels():
@@ -86,12 +86,3 @@ def test_docs_to_wordcount_dicts():
     docs_with_topics = create_corpus_with_topics().documents
     wordcount_dicts = utils.docs_to_wordcount_dicts(docs_with_topics)
     assert expected == wordcount_dicts
-
-
-def test_classification_output():
-    reuters_corpus = data.reuters
-    corpus = utils.corpus_to_documents_with_topics(reuters_corpus)
-
-    acc = classification.classification_for_label(
-        corpus, "grain", '.', test_size=0.8, save_labels=False)
-    print(acc)

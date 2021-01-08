@@ -31,6 +31,7 @@ def test_word_count():
         assert 1<= min(word_counts) <= max(word_counts)
         assert len(document) == len(included_in_document)
     
-    assert sum(data.reuters.word_count.values()) == num_included_in_corpus
-    assert min(data.reuters.word_count.values()) == 1
-    assert max(data.reuters.word_count.values()) > 1
+    corpus_word_count = data.reuters.word_count.values()
+    assert sum(corpus_word_count) == num_included_in_corpus
+    assert min(corpus_word_count) == 1
+    assert max(corpus_word_count) > 1
