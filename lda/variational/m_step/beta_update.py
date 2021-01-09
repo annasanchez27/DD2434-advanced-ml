@@ -26,8 +26,8 @@ def compute_beta_column(corpus, beta, phis, j_vocab):
     w_sparse = compute_sparse_w(corpus, j_vocab)
     for i in range(num_topics):
         sum_d = 0
-        for d in range(len(corpus.documents)):
-            sum_d += np.sum(phis[d][:, i] * w_sparse[d])
+        for d_idx, document in enumerate(corpus.documents):
+            sum_d += np.sum(phis[document][:, i] * w_sparse[d_idx])
         beta[i, j_vocab] = sum_d
     
     return 
