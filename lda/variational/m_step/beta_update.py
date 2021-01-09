@@ -55,7 +55,7 @@ def compute_sparse_w(corpus: Corpus, j_vocab):
     for d_idx, document in enumerate(corpus.documents):
         for n_idx, word in enumerate(document.included_words):
             if word == corpus.vocabulary[j_vocab]:
-                sparse_w[d_idx, n_idx] = 1
+                sparse_w[d_idx][n_idx] = 1
     return sparse_w
             
         
