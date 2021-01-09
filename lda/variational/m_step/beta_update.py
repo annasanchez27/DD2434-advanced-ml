@@ -45,7 +45,7 @@ def create_sparse_w_shape(corpus: Corpus):
     sparse_w = []
     for document in corpus.documents:
         num_words = len(document.included_words)
-        sparse_w.append(np.zeros(num_words, np.int8))
+        sparse_w.append(np.zeros(num_words, dtype=np.int8))
     return sparse_w
 
 #See Eq.9
