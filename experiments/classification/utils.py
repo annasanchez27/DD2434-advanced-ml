@@ -1,7 +1,19 @@
 import numpy as np
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.preprocessing import StandardScaler
 
+
+def create_docs_for_label(label, docs):
+    topic_docs = []
+    non_topic_docs = []
+    for doc in docs:
+        if label in doc.topics:
+            topic_docs.append(doc)
+        else:
+            non_topic_docs.append(doc)
+
+    return topic_docs[:50] + non_topic_docs[:50]
 
 def corpus_to_documents_with_topics(corpus):
     """ Returns list of documents which contain at least one topic. """
@@ -54,7 +66,7 @@ def docs_to_features(X_train_docs, X_test_docs):
 def phis_docs_to_topiccounts(phis, docs):
     topiccounts = []
 
-    for doc in X_train_docs:
+    for doc in docs:
         topiccounts.append(np.sum(phis[doc], axis=0))
 
     return topiccounts
@@ -66,6 +78,13 @@ def phis_to_topiccounts(phis):
         all_topiccounts.append(np.sum(phi, axis=0))
 
     return all_topiccounts
+
+
+def gammas_to_features(gammas, X_train_docs, X_test_docs):
+    gammas_list = np.array(list(gammas.values()))
+    scaled_gammas = StandardScaler().fit_transform(gammas_list)
+    print(scaled_gammas)
+    return scaled_gammas[:len(X_train_docs)], scaled_gammas[len(X_train_docs):]
 
 
 def phis_to_features(phis, X_train_docs, X_test_docs):

@@ -25,7 +25,7 @@ def test_classification_output_grain():
         X_train_docs, X_test_docs, y_train, y_test = train_test_split(
             corpus, labels, test_size=test_frac, random_state=42)
         accuracy = classification.classification_for_label(
-            X_train_docs, X_test_docs, y_train, y_test, test_size=test_frac)
+            X_train_docs, X_test_docs, y_train, y_test)
         assert accuracy == expected_accuracies[test_frac]
 
 
@@ -44,5 +44,5 @@ def test_classification_output_earn():
         X_train_docs, X_test_docs, y_train, y_test = train_test_split(
             corpus, labels, test_size=test_frac, random_state=42)
         accuracy = classification.classification_for_label(
-            X_train_docs, X_test_docs, y_train, y_test, test_size=test_frac)
+            X_train_docs, X_test_docs, y_train, y_test)
         assert accuracy == expected_accuracies[test_frac]
