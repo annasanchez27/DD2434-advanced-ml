@@ -60,6 +60,17 @@ def plot_classification_for_label(documents, label_name, seed_num=5, save_labels
     plt.title("Lower bound evolution")
     plt.show()
 
+    label_filename = label_name + '_labels.npy'
+    label_file = Path(os.path.join(DATA_DIR, label_filename))
+    if save_labels:
+        if not label_file.is_file():
+            labels = topic_to_labels(label_name, documents)
+            np.save(os.path.join(DATA_DIR, label_filename), labels)
+        else:
+            labels = np.load(label_file)
+    else:
+        labels = topic_to_labels(label_name, documents)
+        
     y = []
     yerr = []
     y_lda = []
@@ -71,16 +82,6 @@ def plot_classification_for_label(documents, label_name, seed_num=5, save_labels
         accuracies_lda = []
         accuracies_lda_p = []
         for random_state in tqdm(range(seed_num)):
-            label_filename = label_name + '_labels.npy'
-            label_file = Path(os.path.join(DATA_DIR, label_filename))
-            if save_labels:
-                if not label_file.is_file():
-                    labels = topic_to_labels(label_name, documents)
-                    np.save(os.path.join(DATA_DIR, label_filename), labels)
-                else:
-                    labels = np.load(label_file)
-            else:
-                labels = topic_to_labels(label_name, documents)
 
 
             X_train_docs, X_test_docs, y_train, y_test = train_test_split(
