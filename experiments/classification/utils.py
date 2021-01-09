@@ -15,6 +15,7 @@ def create_docs_for_label(label, docs):
 
     return topic_docs[:50] + non_topic_docs[:50]
 
+
 def corpus_to_documents_with_topics(corpus):
     """ Returns list of documents which contain at least one topic. """
     return [
@@ -72,19 +73,22 @@ def phis_docs_to_topiccounts(phis, docs):
     return topiccounts
 
 
-def phis_to_topiccounts(phis):
-    all_topiccounts = []
-    for phi in phis:
-        all_topiccounts.append(np.sum(phi, axis=0))
+def gammas_docs_to_ordered_gammas(gammas, docs):
+    """ Return gammas in the same order as in docs. """
+    ordered_gammas = []
 
-    return all_topiccounts
+    for doc in docs:
+        ordered_gammas.append(gammas[doc])
+
+    return ordered_gammas
 
 
 def gammas_to_features(gammas, X_train_docs, X_test_docs):
-    gammas_list = np.array(list(gammas.values()))
+    gammas_list = gammas_docs_to_ordered_gammas(gammas, X_train_docs) \
+        + gammas_docs_to_ordered_gammas(gammas, X_test_docs)
     scaled_gammas = StandardScaler().fit_transform(gammas_list)
     print(scaled_gammas)
-    return scaled_gammas[:len(X_train_docs)], scaled_gammas[len(X_train_docs):]
+    return scaled_gammas[:len(X_train_docs)], scaled_gammas[-len(X_test_docs):]
 
 
 def phis_to_features(phis, X_train_docs, X_test_docs):
