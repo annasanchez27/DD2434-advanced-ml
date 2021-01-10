@@ -97,11 +97,11 @@ def plot_classification_for_label(documents, label_name, seed_num=5, save_labels
             accuracies_lda_p.append(acc_lda_p)
 
         y.append(np.mean(accuracies))
-        yerr.append(np.var(accuracies))
+        yerr.append(np.std(accuracies))
         y_lda.append(np.mean(accuracies_lda))
-        yerr_lda.append(np.var(accuracies_lda))
+        yerr_lda.append(np.std(accuracies_lda))
         y_lda_p.append(np.mean(accuracies_lda_p))
-        yerr_lda_p.append(np.var(accuracies_lda_p))
+        yerr_lda_p.append(np.std(accuracies_lda_p))
         print(f'[{iter+1}/{len(train_data_fractions)}] Accuracy for training fraction {train_frac}: {np.mean(accuracies)}')
         # print(f'[{iter+1}/{len(train_data_fractions)}] Accuracy for training fraction (LDA) {train_frac}: {np.mean(accuracies_lda)}')
 
