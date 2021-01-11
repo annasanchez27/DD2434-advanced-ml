@@ -61,8 +61,6 @@ def docs_to_features(X_train_docs, X_test_docs):
 
     return X_train, X_test
 
-# TODO: combine below two
-
 
 def phis_docs_to_topiccounts(phis, docs):
     topiccounts = []
@@ -87,7 +85,6 @@ def gammas_to_features(gammas, X_train_docs, X_test_docs):
     gammas_list = gammas_docs_to_ordered_gammas(gammas, X_train_docs) \
         + gammas_docs_to_ordered_gammas(gammas, X_test_docs)
     scaled_gammas = StandardScaler().fit_transform(gammas_list)
-    print(scaled_gammas)
     return scaled_gammas[:len(X_train_docs)], scaled_gammas[-len(X_test_docs):]
 
 
