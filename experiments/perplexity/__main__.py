@@ -1,28 +1,19 @@
-
-import sys
 from .utils import docs_to_strings
 from plsa.pipeline import DEFAULT_PIPELINE
 from plsa.preprocessors import tokenize
 from plsa.pipeline import Pipeline
 from plsa.corpus import Corpus
 from plsa.algorithms.conditional_plsa import ConditionalPLSA
-from lda.data.corpus import Corpus
+from lda.data import corpus
 from lda.data.word import Word
 from lda.utils import np_seed
 from lda import data
 from lda import lda
-import os
-import argparse
+from lda.variational.e_step import e_step
+from lda.variational.lda import corpus_lower_bound
 import numpy as np
 import collections
-import sys
 import matplotlib.pyplot as plt
-from scipy.special import loggamma, digamma
-sys.path.append("../../../")
-
-DATA_DIR = os.path.join(os.path.dirname(__file__),
-                        '..', 'data', 'perplexity')
-
 
 def unigram(documents):
     wordcount_dict = {}
@@ -123,24 +114,6 @@ def plsa_perplexity(train_docs, test_docs, topics_num, total_words, plsa_corpus)
     return np.exp(-logsum/total_words)
 
 
-def document_lower_bound(corpus, document, alpha, beta, phi, gamma):
-    '''Eq. 15 on the paper. Lower bound to maximize for a document'''
-    supergamma = digamma(gamma) - digamma(gamma.sum())
-    return (
-        loggamma(alpha.sum()) - loggamma(alpha).sum()
-        + np.sum((alpha - 1) * supergamma)
-        + np.sum(phi * supergamma)
-        + np.sum(
-            phi.transpose([1, 0]) * np.log(beta[:, corpus.vocabulary_indices[document]])
-        ) # we pray that this works
-        - loggamma(gamma.sum()) + loggamma(gamma).sum()
-        - np.sum((gamma - 1) * supergamma)
-        - np.sum(
-            phi[phi > 0] * np.log(phi[phi > 0])
-        )
-    )
-
-
 def main():
     all_documents = data.reuters.documents
 
@@ -148,10 +121,11 @@ def main():
     for doc in all_documents:
         if len(doc.included_words) < 100:
             chosen_docs.append(doc)
-        if len(chosen_docs) == 1000:
+        if len(chosen_docs) == 800:
             break
 
-    X_train, X_test = [chosen_docs[:900], chosen_docs[900:]]
+    middle = 720
+    X_train, X_test = [chosen_docs[:middle], chosen_docs[middle:]]
 
     total_words = 0
     for doc in X_test:
@@ -159,12 +133,21 @@ def main():
 
     print(total_words)
 
-    train_corpus = Corpus(X_train)
+    lda_corpus = corpus.Corpus(X_train)
+    lda_test_corpus = corpus.Corpus(X_test)
     with np_seed(123):
-        result = lda(train_corpus, num_topics=2, num_iterations=32)
+        result = lda(lda_corpus, num_topics=2, num_iterations=15)
+        alpha = result['params']['alpha']
+        beta = result['params']['beta']
 
-    plt.plot(result['lower_bound_evol'])
-    plt.show()
+        plt.plot(result['lower_bound_evol'])
+        plt.show()
+
+        corpus_params = e_step(lda_test_corpus, alpha, beta)
+        print(corpus_params)
+        lower_bound = corpus_lower_bound(lda_test_corpus, alpha, beta, corpus_params['phis'], corpus_params['gamma'])
+        print(lower_bound)
+
     # smoothed_unigram = unigram(X_train)
     # uni_perplexity = unigram_perplexity(smoothed_unigram, X_test, total_words)
     # print(uni_perplexity)
@@ -194,3 +177,31 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# topic 2
+# 24025.11428522582
+# topic 5
+# 23032.799234688893
+# topic 10
+# 25054.72069621214
+# topic 20
+# 37644.17346447723
+
+# 1k documents
+# topic 2
+# 6074.552393269465
+# topic 5
+# 5707.787612471717
+# topic 10
+# 5462.004327872516
+
+# 800 docs
+# topic 2
+# 6565.101603427478
+# topic 5
+# 5875.359280397872
+# topic 10
+# 5611.868883403462
+# topic 15
+# 5563.614733709274
