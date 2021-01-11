@@ -5,7 +5,7 @@ description = "Final project for Advanced Machine Learning @ KTH."
 authors = []
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "~3.8"
 numpy = "^1.19.4"
 beautifulsoup4 = "^4.9.3"
 spacy = "^2.3.5"
