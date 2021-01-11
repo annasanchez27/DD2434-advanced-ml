@@ -145,7 +145,7 @@ def main():
 
         corpus_params = e_step(lda_test_corpus, alpha, beta)
         print(corpus_params)
-        lower_bound = corpus_lower_bound(lda_test_corpus, alpha, beta, corpus_params['phis'], corpus_params['gamma'])
+        lower_bound = corpus_lower_bound(lda_test_corpus, alpha, beta, corpus_params['phis'], corpus_params['gammas'])
         print(lower_bound)
 
     # smoothed_unigram = unigram(X_train)
